@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#030403">
+<title>My Love 🌸</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #030403;
+    overflow: hidden;
+    font-family: Georgia, serif;
+    color: #f8e9d0;
+}
+
+canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.message {
+    position: fixed;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 3s ease;
+}
+
+.message.show {
+    opacity: 1;
+}
+
+.eyebrow {
+    font-size: 9px;
+    letter-spacing: 6px;
+    color: #d6bb82;
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: clamp(43px, 9vw, 76px);
+    font-weight: normal;
+    margin-bottom: 18px;
+    text-shadow: 0 0 30px #e5c68a55;
+}
+
+.message p {
+    font-size: clamp(12px, 2.5vw, 16px);
+    line-height: 2;
+    font-style: italic;
+    color: #e2d4bd;
+}
+
+.heart {
+    display: block;
+    font-size: 19px;
+    margin-top: 22px;
+    color: #e9a0ad;
+    animation: heartbeat 2s infinite;
+}
+
+.hint {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #a79b86;
+    opacity: 0;
+    transition: opacity 2s;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+.hint.show {
+    opacity: .7;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="garden"></canvas>
+
+<div class="message" id="message">
+    <div class="eyebrow">FOREVER & ALWAYS</div>
+
+    <h1>Cindy Adomaa Osei</h1>
+
+    <p>
+        I give you these temporary flowers as a little reminder of the depth of my love for you. <br>I want you to read this every day and remember just how much I love and appreciate you, baby girl. And please, show me how I can love you even better.
+Maybe my love hasn’t always been perfect, and maybe I haven’t always gotten everything right, but you’re the first person I’ve ever genuinely loved this deeply, and I’m truly happy that I’ve had the chance to experience this with you.
+I’m always filled with regret because, as much as I know I may never get to be with you forever, I never wanted you to think of me and remember the bad things. <br>Whenever I cross your mind, I want you to remember the beautiful moments we’ve shared, the laughter, the happiness, and all the little things that made us smile. I never wanted to become a source of painful memories for you. That’s why sometimes I cry. Not because I don’t appreciate what we’ve had, but because I regret the moments I could have handled better and the times I fell short of the love you deserved.
+I love you so much, Cindy. <br> Thank you for your kindness, your love, your patience, and everything you’ve shown me. <br>You’re an amazing person, and you’ll always be someone special to me.
+I promise to keep working on myself, to become a better person, and to learn how to love you better, not just through words but through my actions. For you, for me, and for us.
+I love you, baby girl. ❤️
+    </p>
+
+    <span class="heart">♥</span>
+</div>
+
+<div class="hint" id="hint">
+    TOUCH ANYWHERE TO PLANT A FLOWER
+</div>
+
+<script>
+const canvas = document.getElementById("garden");
+const ctx = canvas.getContext("2d");
+
+const message = document.getElementById("message");
+const hint = document.getElementById("hint");
+
+let width, height;
+let flowers = [];
+let grass = [];
+let particles = [];
+
+const colors = [
+    "#f3a2b7",
+    "#e987a1",
+    "#fff0df",
+    "#f7e4c8",
+    "#f5c94e",
+    "#d77e96",
+    "#f8cbd5"
+];
+
+const random = (min, max) =>
+    Math.random() * (max - min) + min;
+
+// Create flowers
+function createFlower(x, customHeight) {
+    return {
+        x,
+        baseY: height + 5,
+        size: random(8, 17),
+        stemHeight: customHeight || random(
+            height * .17,
+            height * .43
+        ),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        petals: Math.floor(random(8, 14)),
+        leaves: Math.floor(random(2, 5)),
+        sway: random(0, Math.PI * 2),
+        speed: random(.6, 1.4),
+        start: performance.now() + random(0, 3500),
+        growth: 2200,
+        type: Math.random() > .86 ? "sunflower" : "normal",
+        depth: random(.4, 1)
+    };
+}
+
+// Create garden
+function createGarden() {
+    flowers = [];
+    grass = [];
+
+    const amount = Math.floor(width / 9);
+
+    for (let i = 0; i < amount; i++) {
+        flowers.push(
+            createFlower(random(-20, width + 20))
+        );
+    }
+
+    flowers.sort((a, b) => a.depth - b.depth);
+
+    for (let i = 0; i < width / 2; i++) {
+        grass.push({
+            x: random(0, width),
+            height: random(20, 110),
+            bend: random(-15, 15),
+            phase: random(0, 10),
+            thickness: random(1, 2.5),
+            shade: Math.random()
+        });
+    }
+}
+
+// Resize canvas
+function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    createGarden();
+}
+
+// Draw leaves
+function drawLeaf(x, y, angle, size) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+
+    ctx.quadraticCurveTo(
+        size * .5, -size * .8,
+        size, 0
+    );
+
+    ctx.quadraticCurveTo(
+        size * .5, size * .8,
+        0, 0
+    );
+
+    ctx.fillStyle = "#426b3d";
+    ctx.fill();
+
+    ctx.strokeStyle = "#78965b";
+    ctx.lineWidth = .7;
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(size, 0);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+// Draw growing flower
+function drawFlower(f, time) {
+    const progress = Math.max(
+        0,
+        Math.min(1, (time - f.start) / f.growth)
+    );
+
+    const grow = 1 - Math.pow(1 - progress, 3);
+
+    if (grow <= 0) return;
+
+    const wind = Math.sin(
+        time * .001 * f.speed + f.sway
+    ) * 8;
+
+    const stemHeight = f.stemHeight * grow;
+
+    const headX = f.x + wind * grow;
+    const headY = f.baseY - stemHeight;
+
+    // Stem
+    ctx.beginPath();
+    ctx.moveTo(f.x, f.baseY);
+
+    ctx.quadraticCurveTo(
+        f.x + wind * .3,
+        f.baseY - stemHeight * .5,
+        headX,
+        headY
+    );
+
+    ctx.strokeStyle = "#365b38";
+    ctx.lineWidth = 1.5 + f.depth;
+    ctx.stroke();
+
+    // Leaves
+    for (let i = 0; i < f.leaves; i++) {
+        const position = (i + 1) / (f.leaves + 1);
+
+        const leafY = f.baseY - stemHeight * position;
+        const leafX = f.x + wind * position * .4;
+
+        drawLeaf(
+            leafX,
+            leafY,
+            i % 2 === 0 ? -.65 : .65,
+            (12 + f.size) * grow
+        );
+    }
+
+    // Flower bloom
+    const bloom = Math.max(
+        0,
+        Math.min(1, (progress - .35) / .65)
+    );
+
+    if (bloom <= 0) return;
+
+    ctx.save();
+    ctx.translate(headX, headY);
+    ctx.rotate(wind * .012);
+    ctx.scale(bloom, bloom);
+
+    // Petals
+    for (let i = 0; i < f.petals; i++) {
+        ctx.save();
+
+        ctx.rotate((Math.PI * 2 / f.petals) * i);
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            -f.size * .58,
+            f.size * .34,
+            f.size * .68,
+            0,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle = f.color;
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = f.color;
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    // Flower centre
+    ctx.shadowBlur = 0;
+
+    ctx.beginPath();
+    ctx.arc(
+        0, 0,
+        f.size * .25,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle =
+        f.type === "sunflower" ? "#80501e" : "#d4a24b";
+
+    ctx.fill();
+
+    ctx.restore();
+}
+
+// Draw grass
+function drawGrass(time) {
+    grass.forEach(g => {
+        const sway = Math.sin(time * .001 + g.phase) * 5;
+
+        ctx.beginPath();
+        ctx.moveTo(g.x, height);
+
+        ctx.quadraticCurveTo(
+            g.x + g.bend * .5 + sway,
+            height - g.height * .5,
+            g.x + g.bend + sway,
+            height - g.height
+        );
+
+        ctx.strokeStyle =
+            g.shade > .5 ? "#355b37" : "#203d27";
+
+        ctx.lineWidth = g.thickness;
+        ctx.stroke();
+    });
+}
+
+// Create glowing particles
+function createParticle(x, y) {
+    for (let i = 0; i < 12; i++) {
+        particles.push({
+            x,
+            y,
+            vx: random(-1.5, 1.5),
+            vy: random(-2, -.4),
+            life: 1,
+            size: random(1, 3)
+        });
+    }
+}
+
+// Animate particles
+function drawParticles() {
+    particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= .012;
+
+        ctx.globalAlpha = Math.max(0, p.life);
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+
+        ctx.fillStyle = "#f8dca0";
+        ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+
+    particles = particles.filter(p => p.life > 0);
+}
+
+// Plant a flower on click or touch
+function plantFlower(x) {
+    const flower = createFlower(x);
+
+    flower.size = random(10, 19);
+    flower.stemHeight = random(
+        height * .22,
+        height * .44
+    );
+
+    flower.start = performance.now();
+
+    flowers.push(flower);
+
+    createParticle(
+        x,
+        height - flower.stemHeight
+    );
+}
+
+// Main animation
+function animate(time) {
+    const background = ctx.createLinearGradient(
+        0, 0, 0, height
+    );
+
+    background.addColorStop(0, "#020203");
+    background.addColorStop(.65, "#080a08");
+    background.addColorStop(1, "#111910");
+
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, width, height);
+
+    flowers.forEach(f => {
+        ctx.globalAlpha = .4 + f.depth * .6;
+        drawFlower(f, time);
+    });
+
+    ctx.globalAlpha = 1;
+
+    drawGrass(time);
+    drawParticles();
+
+    requestAnimationFrame(animate);
+}
+
+// Click or tap to grow flowers
+canvas.addEventListener("pointerdown", e => {
+    plantFlower(e.clientX);
+});
+
+// Start the garden
+resize();
+
+requestAnimationFrame(animate);
+
+// Reveal romantic message
+setTimeout(() => {
+    message.classList.add("show");
+}, 4800);
+
+setTimeout(() => {
+    hint.classList.add("show");
+}, 6500);
+
+window.addEventListener("resize", resize);
+
+</script>
+
+</body>
+</html>
