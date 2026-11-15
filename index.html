@@ -193,7 +193,7 @@ h1 {
 <div class="message" id="message">
     <div class="eyebrow">FOREVER & ALWAYS</div>
 
-    <h1>Cindy Adomaa Osei</h1>
+    <h1>Cindy Adomaa Osei ❤️</h1>
 
     <p>
         I give you these temporary flowers as a little reminder of the depth of my love for you. <br>I want you to read this every day and remember just how much I love and appreciate you, baby girl. And please, show me how I can love you even better.
@@ -238,11 +238,22 @@ const colors = [
     "#f8cbd5"
 ];
 
+const roseColors = [
+    "#c0392b",
+    "#e74c3c",
+    "#ff6b81",
+    "#d6336c",
+    "#b0204a",
+    "#ff8fab"
+];
+
 const random = (min, max) =>
     Math.random() * (max - min) + min;
 
 // Create flowers
 function createFlower(x, customHeight) {
+    const type = (r => r < .12 ? "rose" : r < .28 ? "sunflower" : "normal")(Math.random());
+    const palette = type === "rose" ? roseColors : colors;
     return {
         x,
         baseY: height + 5,
@@ -251,14 +262,14 @@ function createFlower(x, customHeight) {
             height * .17,
             height * .43
         ),
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color: palette[Math.floor(Math.random() * palette.length)],
         petals: Math.floor(random(8, 14)),
         leaves: Math.floor(random(2, 5)),
         sway: random(0, Math.PI * 2),
         speed: random(.6, 1.4),
         start: performance.now() + random(0, 3500),
         growth: 2200,
-        type: Math.random() > .86 ? "sunflower" : "normal",
+        type,
         depth: random(.4, 1)
     };
 }
@@ -402,46 +413,86 @@ function drawFlower(f, time) {
     ctx.scale(bloom, bloom);
 
     // Petals
-    for (let i = 0; i < f.petals; i++) {
-        ctx.save();
+    if (f.type === "rose") {
+        // Layered rose petals
+        const layers = [
+            { count: 5, radius: f.size * .95, petal: f.size * .55, alpha: .9 },
+            { count: 7, radius: f.size * .62, petal: f.size * .42, alpha: .95 },
+            { count: 8, radius: f.size * .34, petal: f.size * .3, alpha: 1 }
+        ];
+        layers.forEach((layer, li) => {
+            for (let i = 0; i < layer.count; i++) {
+                ctx.save();
+                const angle = (Math.PI * 2 / layer.count) * i + li * .35;
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.ellipse(
+                    0,
+                    -layer.radius * .55,
+                    layer.petal * .5,
+                    layer.petal,
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fillStyle = f.color;
+                ctx.globalAlpha = layer.alpha;
+                ctx.shadowBlur = 3;
+                ctx.shadowColor = f.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        });
+        ctx.globalAlpha = 1;
 
-        ctx.rotate((Math.PI * 2 / f.petals) * i);
+        // Rose center
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(0, 0, f.size * .16, 0, Math.PI * 2);
+        ctx.fillStyle = "#5a1a24";
+        ctx.fill();
+    } else {
+        for (let i = 0; i < f.petals; i++) {
+            ctx.save();
+
+            ctx.rotate((Math.PI * 2 / f.petals) * i);
+
+            ctx.beginPath();
+
+            ctx.ellipse(
+                0,
+                -f.size * .58,
+                f.size * .34,
+                f.size * .68,
+                0,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = f.color;
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = f.color;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Flower centre
+        ctx.shadowBlur = 0;
 
         ctx.beginPath();
-
-        ctx.ellipse(
-            0,
-            -f.size * .58,
-            f.size * .34,
-            f.size * .68,
-            0,
+        ctx.arc(
+            0, 0,
+            f.size * .25,
             0,
             Math.PI * 2
         );
 
-        ctx.fillStyle = f.color;
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = f.color;
+        ctx.fillStyle =
+            f.type === "sunflower" ? "#80501e" : "#d4a24b";
+
         ctx.fill();
-
-        ctx.restore();
     }
-
-    // Flower centre
-    ctx.shadowBlur = 0;
-
-    ctx.beginPath();
-    ctx.arc(
-        0, 0,
-        f.size * .25,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fillStyle =
-        f.type === "sunflower" ? "#80501e" : "#d4a24b";
-
-    ctx.fill();
 
     ctx.restore();
 }
