@@ -30,15 +30,30 @@ canvas {
 
 .message {
     position: fixed;
-    top: 38%;
+    top: 6%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
+    transform: translateX(-50%);
+    width: min(90%, 720px);
+    max-height: 86vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     text-align: center;
     z-index: 2;
-    pointer-events: none;
+    pointer-events: auto;
     opacity: 0;
     transition: opacity 3s ease;
+    padding: 0 8px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #d6bb8255 transparent;
+}
+
+.message::-webkit-scrollbar {
+    width: 6px;
+}
+
+.message::-webkit-scrollbar-thumb {
+    background: #d6bb8255;
+    border-radius: 3px;
 }
 
 .message.show {
@@ -97,6 +112,40 @@ h1 {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.25); }
 }
+
+@media (max-width: 600px) {
+    .message {
+        top: 4%;
+        width: 92%;
+        max-height: 88vh;
+    }
+
+    .eyebrow {
+        font-size: 8px;
+        letter-spacing: 4px;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        font-size: clamp(28px, 8vw, 40px);
+        margin-bottom: 12px;
+    }
+
+    .message p {
+        font-size: clamp(11px, 3.2vw, 14px);
+        line-height: 1.8;
+    }
+
+    .heart {
+        font-size: 16px;
+        margin-top: 14px;
+    }
+
+    .hint {
+        font-size: 9px;
+        bottom: 14px;
+    }
+}
 </style>
 </head>
 
@@ -122,8 +171,7 @@ I love you, baby girl. ❤️
 </div>
 
 <div class="hint" id="hint">
-    TOUCH ANYWHERE TO PLANT A FLOWER
-</div>
+    TAP OUTSIDE THE TEXT TO PLANT A FLOWER</div>
 
 <script>
 const canvas = document.getElementById("garden");
