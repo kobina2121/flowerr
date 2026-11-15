@@ -34,7 +34,7 @@ canvas {
     left: 50%;
     transform: translateX(-50%);
     width: min(92%, 760px);
-    max-height: 94vh;
+    max-height: 42vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
@@ -118,7 +118,7 @@ h1 {
     .message {
         top: 2%;
         width: 94%;
-        max-height: 96vh;
+        max-height: 40vh;
     }
 
     .eyebrow {
@@ -147,6 +147,42 @@ h1 {
         bottom: 14px;
     }
 }
+
+.ctrl-btn {
+    position: fixed;
+    z-index: 4;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #f8e9d0;
+    background: #0a0d0a99;
+    border: 1px solid #d6bb8255;
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    opacity: .85;
+    transition: opacity .3s;
+    backdrop-filter: blur(4px);
+}
+
+.ctrl-btn:hover {
+    opacity: 1;
+}
+
+#scrollTopBtn {
+    bottom: 20px;
+    right: 16px;
+}
+
+#toggleTextBtn {
+    bottom: 20px;
+    left: 16px;
+}
+
+.message.hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+}
 </style>
 </head>
 
@@ -172,7 +208,11 @@ I love you, baby girl. ❤️
 </div>
 
 <div class="hint" id="hint">
-    TAP OUTSIDE THE TEXT TO PLANT A FLOWER</div>
+    TAP OUTSIDE THE TEXT TO PLANT A FLOWER
+</div>
+
+<button id="scrollTopBtn" class="ctrl-btn" aria-label="Scroll text to top">↑ Top</button>
+<button id="toggleTextBtn" class="ctrl-btn" aria-label="Hide text">Hide text</button>
 
 <script>
 const canvas = document.getElementById("garden");
@@ -180,6 +220,8 @@ const ctx = canvas.getContext("2d");
 
 const message = document.getElementById("message");
 const hint = document.getElementById("hint");
+const scrollTopBtn = document.getElementById("scrollTopBtn");
+const toggleTextBtn = document.getElementById("toggleTextBtn");
 
 let width, height;
 let flowers = [];
@@ -526,6 +568,19 @@ setTimeout(() => {
 setTimeout(() => {
     hint.classList.add("show");
 }, 6500);
+
+// Scroll-to-top button
+scrollTopBtn.addEventListener("click", () => {
+    message.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Hide/show text toggle
+let textHidden = false;
+toggleTextBtn.addEventListener("click", () => {
+    textHidden = !textHidden;
+    message.classList.toggle("hidden", textHidden);
+    toggleTextBtn.textContent = textHidden ? "Show text" : "Hide text";
+});
 
 window.addEventListener("resize", resize);
 
